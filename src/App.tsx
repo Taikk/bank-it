@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { observer } from "mobx-react-lite";
 import {
   Container,
   Row,
@@ -8,85 +8,17 @@ import {
   Offcanvas,
   Modal,
 } from "react-bootstrap";
+import "./App.css";
+import { gameStore } from "./store";
+import GameResults from "./components/gameResults";
 
-type Player = {
-  id: number;
-  name: string;
-  points: number;
-};
-
-const App = () => {
-  const [roundCount, setRoundCount] = useState(5);
-  const [showPlayerSetup, setShowPlayerSetup] = useState(false);
-  const [players, setPlayers] = useState<Player[]>([]);
-  const [newPlayerName, setNewPlayerName] = useState("");
-  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
-  const [totalPoints, setTotalPoints] = useState(0);
-  const [showRules, setShowRules] = useState(false); // State for rules modal
-
-  // Player Management Functions
-  const addPlayer = () => {
-    if (newPlayerName.trim()) {
-      const newPlayer: Player = {
-        id: Date.now(),
-        name: newPlayerName.trim(),
-        points: 0,
-      };
-      setPlayers([...players, newPlayer]);
-      setNewPlayerName("");
-    }
-  };
-
-  const removePlayer = (id: number) => {
-    setPlayers(players.filter((player) => player.id !== id));
-  };
-
-  const movePlayerUp = (index: number) => {
-    if (index > 0) {
-      const newPlayers = [...players];
-      [newPlayers[index], newPlayers[index - 1]] = [
-        newPlayers[index - 1],
-        newPlayers[index],
-      ];
-      setPlayers(newPlayers);
-    }
-  };
-
-  const movePlayerDown = (index: number) => {
-    if (index < players.length - 1) {
-      const newPlayers = [...players];
-      [newPlayers[index], newPlayers[index + 1]] = [
-        newPlayers[index + 1],
-        newPlayers[index],
-      ];
-      setPlayers(newPlayers);
-    }
-  };
-
-  const handleStartGame = () => {
-    setShowPlayerSetup(false);
-  };
-
-  const handleNumberSelect = (number: number) => {
-    setTotalPoints((prev) => prev + number);
-
-    const nextPlayerIndex = (currentPlayerIndex + 1) % players.length;
-    setCurrentPlayerIndex(nextPlayerIndex);
-
-    const updatedPlayers = [...players];
-    updatedPlayers[currentPlayerIndex] = {
-      ...updatedPlayers[currentPlayerIndex],
-      points: updatedPlayers[currentPlayerIndex].points + number,
-    };
-    setPlayers(updatedPlayers);
-  };
-
+const App = observer(() => {
   const renderPlayerSetupPane = () => (
     <Offcanvas
-      show={showPlayerSetup}
-      onHide={() => setShowPlayerSetup(false)}
+      show={gameStore.showPlayerSetup}
+      onHide={() => gameStore.setShowPlayerSetup(false)}
       placement="bottom"
-      style={{ height: "80vh", transition: "transform 0.3s ease-in-out" }}
+      className="player-setup-pane"
     >
       <Offcanvas.Header closeButton>
         <Offcanvas.Title>Add Players</Offcanvas.Title>
@@ -97,14 +29,14 @@ const App = () => {
             <Form.Control
               type="text"
               placeholder="Enter player name"
-              value={newPlayerName}
-              onChange={(e) => setNewPlayerName(e.target.value)}
+              value={gameStore.newPlayerName}
+              onChange={(e) => gameStore.setNewPlayerName(e.target.value)}
               className="me-2"
             />
             <Button
               variant="success"
-              onClick={addPlayer}
-              disabled={!newPlayerName.trim()}
+              onClick={gameStore.addPlayer}
+              disabled={!gameStore.newPlayerName.trim()}
             >
               Add
             </Button>
@@ -113,7 +45,7 @@ const App = () => {
 
         <Row className="justify-content-center overflow-auto">
           <Col xs={12} md={6}>
-            {players.map((player, index) => (
+            {gameStore.players.map((player, index) => (
               <div key={player.id} className="d-flex align-items-center mb-2">
                 <div className="me-3">{index + 1}.</div>
                 <div className="flex-grow-1">{player.name}</div>
@@ -122,7 +54,7 @@ const App = () => {
                     variant="outline-secondary"
                     size="sm"
                     className="me-1"
-                    onClick={() => movePlayerUp(index)}
+                    onClick={() => gameStore.movePlayerUp(index)}
                     disabled={index === 0}
                   >
                     Up
@@ -131,15 +63,15 @@ const App = () => {
                     variant="outline-secondary"
                     size="sm"
                     className="me-1"
-                    onClick={() => movePlayerDown(index)}
-                    disabled={index === players.length - 1}
+                    onClick={() => gameStore.movePlayerDown(index)}
+                    disabled={index === gameStore.players.length - 1}
                   >
                     Down
                   </Button>
                   <Button
                     variant="outline-danger"
                     size="sm"
-                    onClick={() => removePlayer(player.id)}
+                    onClick={() => gameStore.removePlayer(player.id)}
                   >
                     Remove
                   </Button>
@@ -154,8 +86,8 @@ const App = () => {
             <Button
               variant="primary"
               size="lg"
-              disabled={players.length === 0}
-              onClick={handleStartGame}
+              disabled={gameStore.players.length === 0}
+              onClick={gameStore.startGame}
             >
               Let's GO
             </Button>
@@ -166,7 +98,10 @@ const App = () => {
   );
 
   const renderRulesModal = () => (
-    <Modal show={showRules} onHide={() => setShowRules(false)}>
+    <Modal
+      show={gameStore.showRules}
+      onHide={() => gameStore.setShowRules(false)}
+    >
       <Modal.Header closeButton>
         <Modal.Title>Game Rules</Modal.Title>
       </Modal.Header>
@@ -192,30 +127,45 @@ const App = () => {
   );
 
   const renderGameScreen = () => (
-    <Container fluid className="vh-100 d-flex flex-column">
+    <Container
+      fluid
+      className={`screen ${
+        gameStore.isGameStarted && !gameStore.isGameOver
+          ? "screen-visible"
+          : "screen-hidden"
+      } vh-100 d-flex flex-column`}
+    >
       <Row className="justify-content-between align-items-center bg-primary text-white py-2 px-4">
         <Col>
           <h1>Bank It!</h1>
         </Col>
+        <Col className="text-center">
+          <h2>
+            Round {gameStore.currentRound} of {gameStore.roundCount}
+          </h2>
+        </Col>
         <Col className="text-end">
-          <Button variant="light" onClick={() => setShowRules(true)}>
+          <Button variant="light" onClick={() => gameStore.setShowRules(true)}>
             Rules
           </Button>
         </Col>
       </Row>
 
-      <Row
-        className="justify-content-center align-items-center"
-        style={{ height: "60%" }}
-      >
+      <Row className="justify-content-center align-items-center points-display">
         <Col className="text-center">
-          <h1 style={{ fontSize: "6rem" }}>{totalPoints}</h1>
+          <h1 className="points-value">{gameStore.totalPoints}</h1>
         </Col>
       </Row>
 
       <Row className="justify-content-center mb-3">
         <Col className="text-center">
-          <h2>{players[currentPlayerIndex].name}'s Turn</h2>
+          {gameStore.isGameOver ? (
+            <h2>Game Over!</h2>
+          ) : (
+            <h2>
+              {gameStore.players[gameStore.currentPlayerIndex]?.name}'s Turn
+            </h2>
+          )}
         </Col>
       </Row>
 
@@ -226,76 +176,135 @@ const App = () => {
               <Button
                 key={num}
                 variant="outline-primary"
-                onClick={() => handleNumberSelect(num)}
-                style={{ width: "80px" }}
+                onClick={() => gameStore.handleNumberSelect(num)}
+                className="number-button"
+                disabled={gameStore.isGameOver}
               >
                 {num}
+                {num === 7 && " (50pts)"}
               </Button>
             ))}
 
             <Button
               variant="outline-primary"
-              onClick={() => handleNumberSelect(totalPoints)}
-              style={{ width: "80px" }}
+              onClick={() =>
+                gameStore.handleNumberSelect(gameStore.totalPoints)
+              }
+              className="number-button"
+              disabled={gameStore.isGameOver}
             >
               Double
             </Button>
+
+            <Button
+              variant="success"
+              onClick={gameStore.bankPoints}
+              className="number-button"
+              disabled={gameStore.isGameOver || gameStore.totalPoints === 0}
+            >
+              Bank
+            </Button>
+
+            <Button
+              variant="danger"
+              onClick={gameStore.clearRound}
+              className="number-button"
+              disabled={gameStore.isGameOver}
+            >
+              Clear
+            </Button>
+          </div>
+        </Col>
+      </Row>
+
+      <Row className="justify-content-center mb-3">
+        <Col xs={12} md={8}>
+          <div className="text-center">
+            <h3>Scores:</h3>
+            {gameStore.players.map((player) => (
+              <div key={player.id}>
+                {player.name}: {player.points} points
+              </div>
+            ))}
           </div>
         </Col>
       </Row>
     </Container>
   );
 
-  return (
-    <>
-      <Container fluid className="vh-100 d-flex flex-column">
-        <Row className="bg-primary text-white text-center py-3">
-          <Col>
-            <h1>Bank It!</h1>
-          </Col>
-          <Col className="text-end">
-            <Button variant="light" onClick={() => setShowRules(true)}>
-              Rules
-            </Button>
-          </Col>
-        </Row>
-
-        <Row className="flex-grow-1 align-items-center justify-content-center">
-          <Col xs={12} className="text-center">
-            IMAGE
-          </Col>
-        </Row>
-
-        <Row className="bg-light py-3 position-absolute bottom-0 w-100">
-          <Col className="d-flex flex-column align-items-center">
-            <div className="d-flex gap-3 mb-3">
-              {[5, 10, 20].map((rounds) => (
-                <Form.Check
-                  key={rounds}
-                  type="radio"
-                  label={`${rounds} Rounds`}
-                  name="roundOptions"
-                  checked={roundCount === rounds}
-                  onChange={() => setRoundCount(rounds)}
-                />
-              ))}
-            </div>
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={() => setShowPlayerSetup(true)}
-            >
-              Start Game
-            </Button>
-          </Col>
-        </Row>
-      </Container>
-
-      {renderPlayerSetupPane()}
-      {players.length > 0 && !showPlayerSetup && renderGameScreen()}
-      {renderRulesModal()}
-    </>
+  const renderResultsScreen = () => (
+    <div
+      className={`screen ${
+        gameStore.isGameOver ? "screen-visible" : "screen-hidden"
+      }`}
+    >
+      <GameResults
+        players={gameStore.players}
+        onPlayAgain={() => gameStore.resetGame()}
+        onReturnToMenu={() => gameStore.returnToMenu()}
+      />
+    </div>
   );
-};
+
+  const renderWelcomeScreen = () => (
+    <Container
+      fluid
+      className={`screen ${
+        gameStore.isGameStarted ? "screen-hidden" : "screen-visible"
+      } vh-100 d-flex flex-column`}
+    >
+      <Row className="bg-primary text-white text-center py-3">
+        <Col>
+          <h1>Bank It!</h1>
+        </Col>
+        <Col className="text-end">
+          <Button variant="light" onClick={() => gameStore.setShowRules(true)}>
+            Rules
+          </Button>
+        </Col>
+      </Row>
+
+      <Row className="flex-grow-1 align-items-center justify-content-center">
+        <Col xs={12} className="text-center">
+          IMAGE
+        </Col>
+      </Row>
+
+      <Row className="bg-light py-3 position-absolute bottom-0 w-100">
+        <Col className="d-flex flex-column align-items-center">
+          <div className="d-flex gap-3 mb-3">
+            {[5, 10, 20].map((rounds) => (
+              <Form.Check
+                key={rounds}
+                type="radio"
+                label={`${rounds} Rounds`}
+                name="roundOptions"
+                checked={gameStore.roundCount === rounds}
+                onChange={() => gameStore.setRoundCount(rounds)}
+              />
+            ))}
+          </div>
+          <Button
+            variant="primary"
+            size="lg"
+            onClick={() => gameStore.setShowPlayerSetup(true)}
+          >
+            Start Game
+          </Button>
+        </Col>
+      </Row>
+    </Container>
+  );
+
+  return (
+    <div className="game-container">
+      {renderWelcomeScreen()}
+      {renderGameScreen()}
+      {renderResultsScreen()}
+      {renderPlayerSetupPane()}
+      {renderRulesModal()}
+    </div>
+  );
+});
 
 export default App;
