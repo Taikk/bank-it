@@ -12,7 +12,7 @@
 
 .points-display {
   height: 60%;
-  padding-bottom: env(safe-area-inset-bottom); /* Add safe area padding */
+  /* padding-bottom: env(safe-area-inset-bottom); Add safe area padding */
 }
 
 .points-value {
@@ -34,7 +34,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  padding-bottom: env(safe-area-inset-bottom); /* Add safe area padding */
+  /* padding-bottom: env(safe-area-inset-bottom); Add safe area padding */
 }
 
 .screen-visible {
