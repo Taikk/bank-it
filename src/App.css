@@ -1,13 +1,11 @@
 .game-container {
   position: relative;
-  height: 100vh;
-  height: 100dvh; /* Add dynamic viewport height */
+  height: 100dvh;
   overflow: hidden;
 }
 
 .vh-100 {
-  height: 100vh;
-  height: 100dvh; /* Add dynamic viewport height */
+  height: 100dvh;
 }
 
 .points-display {
@@ -51,10 +49,8 @@
   position: absolute;
 }
 
-/* Update the min-height to use dvh */
 .game-container {
   position: relative;
-  min-height: 100vh;
   min-height: 100dvh; /* Add dynamic viewport height */
   overflow: hidden;
 }
