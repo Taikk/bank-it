@@ -1,17 +1,15 @@
 .game-container {
   position: relative;
-  min-height: 100dvh;
-  overflow: hidden;
-  padding-bottom: env(
-    safe-area-inset-bottom
-  ); /* Add padding for safe area inset */
+  min-height: 100dvh; /* Full height of the viewport */
+  overflow: hidden; /* Prevent overflow */
+  padding-bottom: env(safe-area-inset-bottom); /* Add padding for safe area inset */
+  display: flex;
+  flex-direction: column;
 }
 
 .points-display {
   height: 60%;
-  padding-bottom: env(
-    safe-area-inset-bottom
-  ); /* Add padding for safe area inset */
+  padding-bottom: env(safe-area-inset-bottom); /* Add padding for safe area inset */
 }
 
 .points-value {
@@ -33,9 +31,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  padding-bottom: env(
-    safe-area-inset-bottom
-  ); /* Add padding for safe area inset */
+  padding-bottom: env(safe-area-inset-bottom); /* Add padding for safe area inset */
 }
 
 .screen-visible {
