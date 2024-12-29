@@ -10,7 +10,7 @@
 
 .points-display {
   height: 60%;
-  /* padding-bottom: env(safe-area-inset-bottom); Add safe area padding */
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .points-value {
@@ -32,7 +32,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  /* padding-bottom: env(safe-area-inset-bottom); Add safe area padding */
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .screen-visible {
@@ -51,6 +51,6 @@
 
 .game-container {
   position: relative;
-  min-height: 100dvh; /* Add dynamic viewport height */
+  min-height: 100dvh;
   overflow: hidden;
 }
