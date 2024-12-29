@@ -1,15 +1,18 @@
 .game-container {
   position: relative;
   height: 100vh;
+  height: 100dvh; /* Add dynamic viewport height */
   overflow: hidden;
 }
 
 .vh-100 {
   height: 100vh;
+  height: 100dvh; /* Add dynamic viewport height */
 }
 
 .points-display {
   height: 60%;
+  padding-bottom: env(safe-area-inset-bottom); /* Add safe area padding */
 }
 
 .points-value {
@@ -20,12 +23,18 @@
   width: 80px;
 }
 
+.player-setup-pane {
+  height: 80vh;
+  transition: transform 0.3s ease-in-out;
+}
+
 .screen {
   transition: all 0.3s ease-in-out;
   width: 100%;
   position: absolute;
   top: 0;
   left: 0;
+  padding-bottom: env(safe-area-inset-bottom); /* Add safe area padding */
 }
 
 .screen-visible {
@@ -42,18 +51,10 @@
   position: absolute;
 }
 
-/* Add this if you want to ensure screens don't overlap during transition */
+/* Update the min-height to use dvh */
 .game-container {
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh; /* Add dynamic viewport height */
   overflow: hidden;
-}
-
-.custom-offcanvas .offcanvas-body {
-  display: flex;
-  flex-direction: column;
-}
-
-.custom-offcanvas .offcanvas-body .mt-auto {
-  margin-top: auto;
 }
