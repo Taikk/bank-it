@@ -17,13 +17,14 @@ const App = observer(() => {
     <Offcanvas
       show={gameStore.showPlayerSetup}
       onHide={() => gameStore.setShowPlayerSetup(false)}
-      placement="bottom"
-      className="player-setup-pane"
+      placement="top"
+      className="align-items-between custom-offcanvas"
+      style={{ height: "80vh" }}
     >
       <Offcanvas.Header closeButton>
         <Offcanvas.Title>Add Players</Offcanvas.Title>
       </Offcanvas.Header>
-      <Offcanvas.Body>
+      <Offcanvas.Body className="d-flex flex-column">
         <Row className="my-3 justify-content-center">
           <Col xs={12} md={6} className="d-flex">
             <Form.Control
@@ -43,7 +44,7 @@ const App = observer(() => {
           </Col>
         </Row>
 
-        <Row className="justify-content-center overflow-auto">
+        <Row className="justify-content-center overflow-auto flex-grow-1">
           <Col xs={12} md={6}>
             {gameStore.players.map((player, index) => (
               <div key={player.id} className="d-flex align-items-center mb-2">
@@ -52,24 +53,6 @@ const App = observer(() => {
                 <div>
                   <Button
                     variant="outline-secondary"
-                    size="sm"
-                    className="me-1"
-                    onClick={() => gameStore.movePlayerUp(index)}
-                    disabled={index === 0}
-                  >
-                    Up
-                  </Button>
-                  <Button
-                    variant="outline-secondary"
-                    size="sm"
-                    className="me-1"
-                    onClick={() => gameStore.movePlayerDown(index)}
-                    disabled={index === gameStore.players.length - 1}
-                  >
-                    Down
-                  </Button>
-                  <Button
-                    variant="outline-danger"
                     size="sm"
                     onClick={() => gameStore.removePlayer(player.id)}
                   >
@@ -81,15 +64,18 @@ const App = observer(() => {
           </Col>
         </Row>
 
-        <Row className="fixed-bottom p-3">
-          <Col className="text-center">
+        <Row className="mt-auto">
+          <Col xs={12} md={6} className="mx-auto">
             <Button
+              className="w-100"
               variant="primary"
-              size="lg"
-              disabled={gameStore.players.length === 0}
-              onClick={gameStore.startGame}
+              onClick={() => {
+                gameStore.startGame();
+                gameStore.setShowPlayerSetup(false);
+              }}
+              disabled={gameStore.players.length < 2}
             >
-              Let's GO
+              Game Start!
             </Button>
           </Col>
         </Row>

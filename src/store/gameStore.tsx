@@ -94,41 +94,9 @@ export class GameStore {
     }, 300);
   };
 
-  moveToNextPlayer = () => {
-    // Find next unfinished player
-    let nextPlayerIndex = this.currentPlayerIndex;
-    do {
-      nextPlayerIndex = (nextPlayerIndex + 1) % this.players.length;
-    } while (
-      this.players[nextPlayerIndex].hasFinished &&
-      nextPlayerIndex !== this.currentPlayerIndex
-    );
-
-    this.currentPlayerIndex = nextPlayerIndex;
-    this.totalPoints = 0;
-  };
-
-  checkRoundEnd = () => {
-    const allPlayersFinished = this.players.every(
-      (player) => player.hasFinished
-    );
-
-    if (allPlayersFinished) {
-      if (this.currentRound >= this.roundCount) {
-        this.isGameFinished = true; // Set this when game should end
-      } else {
-        this.currentRound++;
-        this.players.forEach((player) => (player.hasFinished = false));
-        this.currentPlayerIndex = 0;
-        this.totalPoints = 0;
-      }
-    }
-  };
-
   clearRound = () => {
-    // Mark current player as finished and move to next player
-    this.players[this.currentPlayerIndex].hasFinished = true;
-    this.moveToNextPlayer();
+    // Mark all players as finished
+    this.players.forEach((player) => (player.hasFinished = true));
     this.checkRoundEnd();
   };
 
@@ -145,6 +113,8 @@ export class GameStore {
     } else {
       this.totalPoints += number;
     }
+
+    this.moveToNextPlayer();
   };
 
   bankPoints = () => {
@@ -156,6 +126,32 @@ export class GameStore {
 
     this.moveToNextPlayer();
     this.checkRoundEnd();
+  };
+
+  checkRoundEnd = () => {
+    if (this.players.every((player) => player.hasFinished)) {
+      if (this.currentRound >= this.roundCount) {
+        this.isGameFinished = true; // Set this when game should end
+      } else {
+        this.currentRound++;
+        this.players.forEach((player) => (player.hasFinished = false));
+        this.moveToNextPlayer();
+        this.totalPoints = 0;
+      }
+    }
+  };
+
+  moveToNextPlayer = () => {
+    // Find next unfinished player
+    let nextPlayerIndex = this.currentPlayerIndex;
+    do {
+      nextPlayerIndex = (nextPlayerIndex + 1) % this.players.length;
+    } while (
+      this.players[nextPlayerIndex].hasFinished &&
+      nextPlayerIndex !== this.currentPlayerIndex
+    );
+
+    this.currentPlayerIndex = nextPlayerIndex;
   };
 
   setShowPlayerSetup = (show: boolean) => {
