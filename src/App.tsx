@@ -25,7 +25,7 @@ const App = observer(() => {
         <Offcanvas.Title>Add Players</Offcanvas.Title>
       </Offcanvas.Header>
       <Offcanvas.Body className="d-flex flex-column">
-        <Row className="my-3 justify-content-center">
+        <Row className="my-3 justify-content-center flex-grow-1">
           <Col xs={12} md={6} className="d-flex">
             <Form.Control
               type="text"
@@ -50,7 +50,25 @@ const App = observer(() => {
               <div key={player.id} className="d-flex align-items-center mb-2">
                 <div className="me-3">{index + 1}.</div>
                 <div className="flex-grow-1">{player.name}</div>
-                <div>
+                <div className="d-flex">
+                  <Button
+                    variant="outline-secondary"
+                    size="sm"
+                    onClick={() => gameStore.movePlayerUp(index)}
+                    className="me-2"
+                    disabled={index === 0}
+                  >
+                    Up
+                  </Button>
+                  <Button
+                    variant="outline-secondary"
+                    size="sm"
+                    onClick={() => gameStore.movePlayerDown(index)}
+                    className="me-2"
+                    disabled={index === gameStore.players.length - 1}
+                  >
+                    Down
+                  </Button>
                   <Button
                     variant="outline-secondary"
                     size="sm"
