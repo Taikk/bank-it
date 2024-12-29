@@ -25,7 +25,7 @@ const App = observer(() => {
         <Offcanvas.Title>Add Players</Offcanvas.Title>
       </Offcanvas.Header>
       <Offcanvas.Body className="d-flex flex-column">
-        <Row className="my-3 justify-content-center flex-grow-1">
+        <Row className="my-3 justify-content-center">
           <Col xs={12} md={6} className="d-flex">
             <Form.Control
               type="text"
