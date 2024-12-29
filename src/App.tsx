@@ -249,13 +249,6 @@ const App = observer(() => {
           </Button>
         </Col>
       </Row>
-
-      <Row className="flex-grow-1 align-items-center justify-content-center">
-        <Col xs={12} className="text-center">
-          IMAGE
-        </Col>
-      </Row>
-
       <Row className="bg-light py-3 position-absolute bottom-0 w-100">
         <Col className="d-flex flex-column align-items-center">
           <div className="d-flex gap-3 mb-3">
